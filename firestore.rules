@@ -1,0 +1,72 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Progresso de formação de cada pessoa.
+    match /progresso/{userId} {
+      // Qualquer pessoa autenticada consulta a lista — é o que alimenta o Painel.
+      allow read: if request.auth != null;
+
+      // Cada pessoa escreve apenas o próprio documento.
+      allow create, update: if request.auth != null && request.auth.uid == userId;
+
+      // Progresso não se apaga pela aplicação.
+      allow delete: if false;
+    }
+
+    // Conversa entre duas pessoas. O id é "uidA__uidB", então estar no
+    // id já prova participação — e, por não depender do conteúdo do
+    // documento, a regra também vale para consultas de lista.
+    match /conversas/{conversaId} {
+      allow get, create, update: if request.auth != null
+        && conversaId.split("__").hasAny([request.auth.uid]);
+
+      // Na listagem por participante, cada documento é testado pelo conteúdo.
+      allow list: if request.auth != null
+        && request.auth.uid in resource.data.participants;
+
+      allow delete: if false;
+
+      match /mensagens/{mensagemId} {
+        allow read: if request.auth != null
+          && conversaId.split("__").hasAny([request.auth.uid]);
+
+        allow create: if request.auth != null
+          && conversaId.split("__").hasAny([request.auth.uid])
+          && request.resource.data.from == request.auth.uid;
+
+        allow update: if false;
+
+        // Limpar a conversa é permitido aos dois participantes.
+        allow delete: if request.auth != null
+          && conversaId.split("__").hasAny([request.auth.uid]);
+      }
+    }
+
+    // Canais abertos: todo mundo do sistema lê e escreve.
+    match /canais/{canalId} {
+      allow read, create, update: if request.auth != null;
+      allow delete: if false;
+
+      match /mensagens/{mensagemId} {
+        allow read: if request.auth != null;
+
+        allow create: if request.auth != null
+          && request.resource.data.from == request.auth.uid;
+
+        allow update: if false;
+
+        // Limpar um canal apaga o histórico de todos: só de Líder para cima.
+        allow delete: if request.auth != null
+          && (request.auth.token.role in ["Administrador", "Suporte", "Líder"]
+            || request.auth.token.email == "adm.zello@zello.tec.br");
+      }
+    }
+
+    // Nada além do que está declarado acima.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

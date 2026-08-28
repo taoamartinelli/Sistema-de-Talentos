@@ -1,0 +1,122 @@
+import { Flashcard } from '../trilha360';
+
+/** 100 flash cards da trilha de Kubernetes, distribuídos pelos 9 módulos. */
+export const KUBERNETES_FLASHCARDS: Flashcard[] = [
+  /* ------------------------- Módulo 1 — Pods (10) ------------------------ */
+  { id: 'kf-1', moduleId: 'k8s-1', front: 'O que é um Pod?', back: 'A menor unidade do Kubernetes: uma "caixinha" que guarda um ou mais contêineres.' },
+  { id: 'kf-2', moduleId: 'k8s-1', front: 'O que os contêineres de um Pod compartilham?', back: 'A rede (mesmo IP), o armazenamento e as configurações.' },
+  { id: 'kf-3', moduleId: 'k8s-1', front: 'Qual a metáfora do Pod?', back: 'Uma mochila: você coloca lanche, água e livros — e tudo anda junto.' },
+  { id: 'kf-4', moduleId: 'k8s-1', front: 'Para que serve um Pod?', back: 'Executar aplicações, agrupar contêineres que trabalham juntos e controlar recursos.' },
+  { id: 'kf-5', moduleId: 'k8s-1', front: 'Quais são as três partes de um Pod?', back: 'Metadata (nome e labels), Spec (contêineres, volumes e portas) e Status.' },
+  { id: 'kf-6', moduleId: 'k8s-1', front: 'Quais são as fases do ciclo de vida do Pod?', back: 'Criado, inicializando, rodando e finalizado.' },
+  { id: 'kf-7', moduleId: 'k8s-1', front: 'Qual comando lista os Pods?', back: 'kubectl get pods' },
+  { id: 'kf-8', moduleId: 'k8s-1', front: 'Qual comando mostra os detalhes de um Pod?', back: 'kubectl describe pod nome' },
+  { id: 'kf-9', moduleId: 'k8s-1', front: 'Qual é a boa prática sobre processos em um Pod?', back: 'Um processo principal por Pod.' },
+  { id: 'kf-10', moduleId: 'k8s-1', front: 'Exemplo de dois contêineres no mesmo Pod', back: 'O contêiner do site e o contêiner de logs, que trabalham juntos.' },
+
+  /* ---------------------- Módulo 2 — Deployment (12) --------------------- */
+  { id: 'kf-11', moduleId: 'k8s-2', front: 'O que é um Deployment?', back: 'O recurso que controla como a aplicação é criada, atualizada e mantida rodando.' },
+  { id: 'kf-12', moduleId: 'k8s-2', front: 'Qual a metáfora do Deployment?', back: 'O gerente da loja: se um vendedor falta, ele chama outro automaticamente.' },
+  { id: 'kf-13', moduleId: 'k8s-2', front: 'Qual o fluxo interno do Deployment?', back: 'Deployment → ReplicaSet → Pods.' },
+  { id: 'kf-14', moduleId: 'k8s-2', front: 'O que faz o ReplicaSet?', back: 'Controla os Pods, garantindo o número de réplicas definido.' },
+  { id: 'kf-15', moduleId: 'k8s-2', front: 'O que define spec.replicas?', back: 'Quantos Pods devem existir.' },
+  { id: 'kf-16', moduleId: 'k8s-2', front: 'Para que serve spec.selector?', back: 'Para identificar quais Pods pertencem ao Deployment.' },
+  { id: 'kf-17', moduleId: 'k8s-2', front: 'O que é rolling update?', back: 'A atualização que cria os Pods novos e remove os antigos aos poucos, sem derrubar o sistema.' },
+  { id: 'kf-18', moduleId: 'k8s-2', front: 'Para que serve o rollback?', back: 'Para voltar à versão anterior quando a nova apresenta problema.' },
+  { id: 'kf-19', moduleId: 'k8s-2', front: 'Qual comando escala um Deployment?', back: 'kubectl scale deployment nome --replicas=5' },
+  { id: 'kf-20', moduleId: 'k8s-2', front: 'Qual comando desfaz uma atualização?', back: 'kubectl rollout undo deployment nome' },
+  { id: 'kf-21', moduleId: 'k8s-2', front: 'Qual comando acompanha o progresso de uma atualização?', back: 'kubectl rollout status deployment nome' },
+  { id: 'kf-22', moduleId: 'k8s-2', front: 'Quais são as boas práticas do Deployment?', back: 'Sempre usar Deployment para aplicações, definir limites de recursos, usar labels e testar o rollback.' },
+
+  /* ------------------------ Módulo 3 — Service (12) ---------------------- */
+  { id: 'kf-23', moduleId: 'k8s-3', front: 'O que é um Service?', back: 'O recurso que cria um endereço fixo para acessar os Pods, mesmo quando eles mudam.' },
+  { id: 'kf-24', moduleId: 'k8s-3', front: 'Qual a metáfora do Service?', back: 'Os Pods são casas que mudam de lugar; o Service é o endereço fixo da rua.' },
+  { id: 'kf-25', moduleId: 'k8s-3', front: 'Como o Service encontra os Pods?', back: 'Pelas labels.' },
+  { id: 'kf-26', moduleId: 'k8s-3', front: 'Qual é o fluxo de acesso via Service?', back: 'Usuário → Service → Pod.' },
+  { id: 'kf-27', moduleId: 'k8s-3', front: 'O que acontece quando um Pod cai?', back: 'O Service envia a requisição para outro Pod automaticamente.' },
+  { id: 'kf-28', moduleId: 'k8s-3', front: 'O que é o tipo ClusterIP?', back: 'Acesso interno ao cluster — por exemplo, o backend acessando o banco.' },
+  { id: 'kf-29', moduleId: 'k8s-3', front: 'O que é o tipo NodePort?', back: 'Acesso externo pela porta do servidor (Node).' },
+  { id: 'kf-30', moduleId: 'k8s-3', front: 'O que é o tipo LoadBalancer?', back: 'Cria um IP público automaticamente, em ambientes de nuvem.' },
+  { id: 'kf-31', moduleId: 'k8s-3', front: 'O que é o tipo ExternalName?', back: 'Aponta para um serviço externo ao cluster.' },
+  { id: 'kf-32', moduleId: 'k8s-3', front: 'Quais campos compõem o spec de um Service?', back: 'type, ports e selector.' },
+  { id: 'kf-33', moduleId: 'k8s-3', front: 'O que o Service faz com as requisições?', back: 'Distribui entre os Pods automaticamente — balanceamento de carga.' },
+  { id: 'kf-34', moduleId: 'k8s-3', front: 'Qual tipo de Service evitar em produção?', back: 'NodePort.' },
+
+  /* ------------------- Módulo 4 — ConfigMap e Secret (10) ---------------- */
+  { id: 'kf-35', moduleId: 'k8s-4', front: 'O que é um ConfigMap?', back: 'O recurso que guarda configurações da aplicação, separando configuração do código.' },
+  { id: 'kf-36', moduleId: 'k8s-4', front: 'O que costuma ficar em um ConfigMap?', back: 'URLs, portas, mensagens e variáveis de ambiente.' },
+  { id: 'kf-37', moduleId: 'k8s-4', front: 'Qual a vantagem de usar ConfigMap?', back: 'Trocar a configuração — como o endereço do banco — sem alterar o código.' },
+  { id: 'kf-38', moduleId: 'k8s-4', front: 'O que é um Secret?', back: 'O recurso que guarda informações sensíveis: senhas, tokens, chaves e certificados.' },
+  { id: 'kf-39', moduleId: 'k8s-4', front: 'Qual a metáfora do Secret?', back: 'Um cofre onde se guardam as coisas importantes.' },
+  { id: 'kf-40', moduleId: 'k8s-4', front: 'Qual a diferença entre ConfigMap e Secret?', back: 'ConfigMap guarda dados comuns; Secret guarda dados sigilosos.' },
+  { id: 'kf-41', moduleId: 'k8s-4', front: 'Como um Pod consome ConfigMap e Secret?', back: 'Como variável de ambiente, como arquivo ou como parâmetro.' },
+  { id: 'kf-42', moduleId: 'k8s-4', front: 'Quais são os componentes desses recursos?', back: 'Metadata, Data e BinaryData (opcional).' },
+  { id: 'kf-43', moduleId: 'k8s-4', front: 'Qual erro nunca se deve cometer?', back: 'Colocar senha em ConfigMap — dados sigilosos vão para o Secret.' },
+  { id: 'kf-44', moduleId: 'k8s-4', front: 'Quais boas práticas protegem os secrets?', back: 'Usar RBAC, criptografar os secrets e versionar as configurações.' },
+
+  /* ------------------ Módulo 5 — Volumes, PV e PVC (11) ------------------ */
+  { id: 'kf-45', moduleId: 'k8s-5', front: 'O que é um Volume?', back: 'O espaço de armazenamento usado pelos Pods para guardar dados.' },
+  { id: 'kf-46', moduleId: 'k8s-5', front: 'O que acontece sem volume?', back: 'Tudo o que o Pod grava é apagado quando ele morre.' },
+  { id: 'kf-47', moduleId: 'k8s-5', front: 'Qual a metáfora do Volume?', back: 'O Pod é o computador e o volume é o HD: sem HD, desligou, perdeu tudo.' },
+  { id: 'kf-48', moduleId: 'k8s-5', front: 'O que é um emptyDir?', back: 'Um volume temporário, que vive junto com o Pod.' },
+  { id: 'kf-49', moduleId: 'k8s-5', front: 'O que é um hostPath?', back: 'Um volume que usa uma pasta do próprio servidor (Node).' },
+  { id: 'kf-50', moduleId: 'k8s-5', front: 'O que é um PV (Persistent Volume)?', back: 'O disco disponível no cluster, criado pelo administrador — o estoque de HDs.' },
+  { id: 'kf-51', moduleId: 'k8s-5', front: 'O que é um PVC (Persistent Volume Claim)?', back: 'O pedido de um Pod para usar um disco: "quero 10 GB".' },
+  { id: 'kf-52', moduleId: 'k8s-5', front: 'Qual o fluxo do PVC?', back: 'PVC → encontra um PV → o Pod usa o armazenamento.' },
+  { id: 'kf-53', moduleId: 'k8s-5', front: 'Qual a ordem do ciclo de provisionamento?', back: 'Admin cria o PV → usuário cria o PVC → Kubernetes conecta → Pod usa.' },
+  { id: 'kf-54', moduleId: 'k8s-5', front: 'Quais são os modos de acesso?', back: 'ReadWriteOnce, ReadOnlyMany e ReadWriteMany.' },
+  { id: 'kf-55', moduleId: 'k8s-5', front: 'Quais comandos inspecionam armazenamento?', back: 'kubectl get pv, kubectl get pvc e os respectivos describe.' },
+
+  /* ---------------------- Módulo 6 — StatefulSet (11) -------------------- */
+  { id: 'kf-56', moduleId: 'k8s-6', front: 'O que é um StatefulSet?', back: 'O controlador para aplicações que precisam manter identidade e dados fixos.' },
+  { id: 'kf-57', moduleId: 'k8s-6', front: 'Qual a metáfora do StatefulSet?', back: 'A sala de aula: cada aluno tem nome fixo, mesa exclusiva e armário próprio.' },
+  { id: 'kf-58', moduleId: 'k8s-6', front: 'Quando usar StatefulSet?', back: 'Quando a aplicação precisa manter dados, ter nome fixo, ordem de inicialização e volume exclusivo por Pod.' },
+  { id: 'kf-59', moduleId: 'k8s-6', front: 'Cite aplicações que pedem StatefulSet.', back: 'MySQL, PostgreSQL, Kafka, Redis Cluster e Elasticsearch.' },
+  { id: 'kf-60', moduleId: 'k8s-6', front: 'Qual a diferença para o Deployment?', back: 'No Deployment os Pods não têm identidade fixa; no StatefulSet têm nome fixo, volume próprio e ordem controlada.' },
+  { id: 'kf-61', moduleId: 'k8s-6', front: 'Como são nomeados os Pods de um StatefulSet?', back: 'De forma previsível: meu-app-0, meu-app-1, meu-app-2 — e o nome permanece após reiniciar.' },
+  { id: 'kf-62', moduleId: 'k8s-6', front: 'Como funciona o armazenamento no StatefulSet?', back: 'Cada Pod recebe um PVC automático, garantindo que os dados não se percam.' },
+  { id: 'kf-63', moduleId: 'k8s-6', front: 'Qual o fluxo de armazenamento?', back: 'StatefulSet → PVC → PV → disco.' },
+  { id: 'kf-64', moduleId: 'k8s-6', front: 'Qual a ordem de criação e de exclusão?', back: 'Cria do Pod 0 em diante; na exclusão, a ordem é inversa.' },
+  { id: 'kf-65', moduleId: 'k8s-6', front: 'O que é um Service Headless?', back: 'Um Service com ClusterIP: None, que permite acessar cada Pod individualmente.' },
+  { id: 'kf-66', moduleId: 'k8s-6', front: 'Quais boas práticas valem para StatefulSet?', back: 'Usar volumes persistentes, planejar backup, usar Service Headless e monitorar o disco.' },
+
+  /* ------------- Módulo 7 — NetworkPolicy e RBAC (13) -------------------- */
+  { id: 'kf-67', moduleId: 'k8s-7', front: 'O que são policies no Kubernetes?', back: 'Regras que controlam quem acessa quem (rede) e quem pode fazer o quê (permissões).' },
+  { id: 'kf-68', moduleId: 'k8s-7', front: 'O que é uma NetworkPolicy?', back: 'A regra que controla o tráfego de rede entre Pods: quem se conecta a quem, em quais portas e direção.' },
+  { id: 'kf-69', moduleId: 'k8s-7', front: 'O que é uma regra de Ingress?', back: 'Define quem pode entrar — o tráfego de entrada no Pod.' },
+  { id: 'kf-70', moduleId: 'k8s-7', front: 'O que é uma regra de Egress?', back: 'Define para onde o Pod pode sair — o tráfego de saída.' },
+  { id: 'kf-71', moduleId: 'k8s-7', front: 'Como a NetworkPolicy identifica os Pods?', back: 'Por labels: Pod → verifica a policy → permite ou bloqueia.' },
+  { id: 'kf-72', moduleId: 'k8s-7', front: 'Qual a principal boa prática de NetworkPolicy?', back: 'Negar tudo por padrão e liberar apenas o necessário.' },
+  { id: 'kf-73', moduleId: 'k8s-7', front: 'O que significa RBAC?', back: 'Role Based Access Control — controle de acesso baseado em papéis.' },
+  { id: 'kf-74', moduleId: 'k8s-7', front: 'O que faz uma Role?', back: 'Define permissões dentro de um namespace.' },
+  { id: 'kf-75', moduleId: 'k8s-7', front: 'O que é uma ClusterRole?', back: 'Uma Role com permissões globais, válidas em todo o cluster.' },
+  { id: 'kf-76', moduleId: 'k8s-7', front: 'O que faz um RoleBinding?', back: 'Liga um usuário (ou ServiceAccount) a uma Role.' },
+  { id: 'kf-77', moduleId: 'k8s-7', front: 'O que é uma ServiceAccount?', back: 'A identidade usada por uma aplicação para acessar a API do cluster.' },
+  { id: 'kf-78', moduleId: 'k8s-7', front: 'Qual o fluxo do RBAC?', back: 'Usuário → RoleBinding → Role → permissões.' },
+  { id: 'kf-79', moduleId: 'k8s-7', front: 'Qual princípio guia o RBAC?', back: 'O menor privilégio: dar apenas o acesso necessário e revisar periodicamente.' },
+
+  /* ---------------------- Módulo 8 — Scheduling (12) --------------------- */
+  { id: 'kf-80', moduleId: 'k8s-8', front: 'O que é scheduling?', back: 'O processo que decide em qual Node um Pod será executado.' },
+  { id: 'kf-81', moduleId: 'k8s-8', front: 'Qual a metáfora do Scheduler?', back: 'O professor que escolhe em qual sala cada aluno vai sentar.' },
+  { id: 'kf-82', moduleId: 'k8s-8', front: 'Para que serve o scheduling?', back: 'Distribuir carga, evitar sobrecarga, garantir desempenho e usar bem os recursos.' },
+  { id: 'kf-83', moduleId: 'k8s-8', front: 'Quais passos o Scheduler segue?', back: 'Analisa os Nodes, verifica recursos, aplica regras, escolhe o melhor Node e agenda o Pod.' },
+  { id: 'kf-84', moduleId: 'k8s-8', front: 'O que é um Node?', back: 'O servidor do cluster onde os Pods rodam.' },
+  { id: 'kf-85', moduleId: 'k8s-8', front: 'O que é o Node Selector?', back: 'A forma simples de escolher um Node específico usando labels.' },
+  { id: 'kf-86', moduleId: 'k8s-8', front: 'O que é Node Affinity?', back: 'A forma avançada de escolher Nodes, podendo ser obrigatória (required) ou preferencial (preferred).' },
+  { id: 'kf-87', moduleId: 'k8s-8', front: 'O que é um Taint?', back: 'Uma marca que bloqueia Pods em um Node.' },
+  { id: 'kf-88', moduleId: 'k8s-8', front: 'O que é uma Toleration?', back: 'A exceção que permite a um Pod rodar em um Node com taint.' },
+  { id: 'kf-89', moduleId: 'k8s-8', front: 'O que é Pod Anti-Affinity?', back: 'A regra que mantém Pods separados, usada para alta disponibilidade.' },
+  { id: 'kf-90', moduleId: 'k8s-8', front: 'O que é preempção?', back: 'Pods de maior prioridade podem substituir Pods menos importantes.' },
+  { id: 'kf-91', moduleId: 'k8s-8', front: 'Qual boa prática ajuda o Scheduler a decidir?', back: 'Definir requests e limits de CPU e memória.' },
+
+  /* -------------------- Módulo 9 — Troubleshooting (9) ------------------- */
+  { id: 'kf-92', moduleId: 'k8s-9', front: 'O que é troubleshooting?', back: 'Identificar, analisar e corrigir problemas, investigando passo a passo.' },
+  { id: 'kf-93', moduleId: 'k8s-9', front: 'Qual comando mostra os logs de um Pod?', back: 'kubectl logs pod nome' },
+  { id: 'kf-94', moduleId: 'k8s-9', front: 'O que significa CrashLoopBackOff?', back: 'O Pod inicia e cai várias vezes seguidas.' },
+  { id: 'kf-95', moduleId: 'k8s-9', front: 'Quais causas explicam um CrashLoopBackOff?', back: 'Erro na aplicação, variável de ambiente errada, porta errada ou falta de dependência.' },
+  { id: 'kf-96', moduleId: 'k8s-9', front: 'O que verificar quando o Pod não inicia?', back: 'Imagem, configuração, recursos e volume — via get pods, describe pod e eventos.' },
+  { id: 'kf-97', moduleId: 'k8s-9', front: 'O que checar em um problema de rede?', back: 'Se o Service existe, se as labels estão corretas, se há NetworkPolicy bloqueando e se a porta está certa.' },
+  { id: 'kf-98', moduleId: 'k8s-9', front: 'O que checar quando o volume não monta?', back: 'Se o PVC está Bound, se há PV disponível, as permissões e a StorageClass.' },
+  { id: 'kf-99', moduleId: 'k8s-9', front: 'O erro Forbidden indica o quê?', back: 'Problema de permissão — verifique Role, RoleBinding e ServiceAccount.' },
+  { id: 'kf-100', moduleId: 'k8s-9', front: 'Qual é o passo a passo padrão de investigação?', back: 'Identificar o erro → get pods → describe → logs → events → validar recursos → testar a correção.' }
+];
