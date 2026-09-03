@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { formatarNumero, formatarNumeroDuplo, formatarPercentual } from '../utils/numero';
 import {
   AlertCircle,
   Award,
@@ -166,7 +165,7 @@ function moduleScoresOf(snap: ProgressSnapshot, trackId: string): ModuleScore[] 
     return [
       {
         id: module.id,
-        label: `Módulo ${formatarNumeroDuplo(module.number)}`,
+        label: `Módulo ${String(module.number).padStart(2, '0')}`,
         correct: result.correct,
         total: result.total,
         percentage: result.percentage
@@ -457,15 +456,15 @@ export const PainelSection: React.FC<PainelSectionProps> = ({ currentUserId, cur
           ) : null}
           <div className="journey-summary">
             <div>
-              <strong>{formatarNumero(rows.length)}</strong>
+              <strong>{rows.length}</strong>
               <span>{rows.length === 1 ? 'usuário cadastrado' : 'usuários cadastrados'}</span>
             </div>
             <div>
-              <strong>{formatarNumero(comProgresso.length)}</strong>
+              <strong>{comProgresso.length}</strong>
               <span>com progresso disponível</span>
             </div>
             <div>
-              <strong>{formatarPercentual(media)}</strong>
+              <strong>{media}%</strong>
               <span>progresso médio</span>
             </div>
           </div>
@@ -600,14 +599,14 @@ export const PainelSection: React.FC<PainelSectionProps> = ({ currentUserId, cur
                         <div className="painel-block">
                           <span className="painel-block-title">
                             Avaliações e simulados
-                            <em className="painel-count">{formatarNumero(levels.length + simulados.length)}</em>
+                            <em className="painel-count">{levels.length + simulados.length}</em>
                           </span>
                           <ul className="painel-scores">
                             {levels.map((item) => (
                               <li key={item.area} className={item.approved ? '' : 'rejected'}>
                                 <span>{item.area}</span>
                                 <em>
-                                  {item.level} · {formatarNumero(item.correct)}/{formatarNumero(item.total)} · {formatarPercentual(item.percentage)}
+                                  {item.level} · {item.correct}/{item.total} · {item.percentage}%
                                 </em>
                               </li>
                             ))}
@@ -616,7 +615,7 @@ export const PainelSection: React.FC<PainelSectionProps> = ({ currentUserId, cur
                               <li key={item.id} className={item.approved ? '' : 'rejected'}>
                                 <span>Simulado · {item.title}</span>
                                 <em>
-                                  {formatarNumero(item.correct)}/{formatarNumero(item.total)} · {formatarPercentual(item.percentage)} ·{' '}
+                                  {item.correct}/{item.total} · {item.percentage}% ·{' '}
                                   {item.approved ? 'aprovado' : 'não aprovado'}
                                 </em>
                               </li>
@@ -628,7 +627,7 @@ export const PainelSection: React.FC<PainelSectionProps> = ({ currentUserId, cur
                       <div className="painel-block">
                         <span className="painel-block-title">
                           Trilhas
-                          {tracks.length > 0 && <em className="painel-count">{formatarNumero(tracks.length)}</em>}
+                          {tracks.length > 0 && <em className="painel-count">{tracks.length}</em>}
                         </span>
 
                         {tracks.length === 0 ? (
@@ -649,7 +648,7 @@ export const PainelSection: React.FC<PainelSectionProps> = ({ currentUserId, cur
                                     )}
                                   </span>
                                   <strong>
-                                    {track.completed}/{track.total} · {formatarPercentual(track.percentage)}
+                                    {track.completed}/{track.total} · {track.percentage}%
                                   </strong>
                                 </div>
                                 <div className="journey-bar">
@@ -662,9 +661,9 @@ export const PainelSection: React.FC<PainelSectionProps> = ({ currentUserId, cur
                                       <li key={module.id}>
                                         {module.label}
                                         <strong>
-                                          {formatarNumero(module.correct)}/{formatarNumero(module.total)}
+                                          {module.correct}/{module.total}
                                         </strong>
-                                        <em>{formatarPercentual(module.percentage)}</em>
+                                        <em>{module.percentage}%</em>
                                       </li>
                                     ))}
                                   </ul>
@@ -680,7 +679,7 @@ export const PainelSection: React.FC<PainelSectionProps> = ({ currentUserId, cur
                         <span className="painel-block-title">
                           Certificados
                           {certificados.length > 0 && (
-                            <em className="painel-count">{formatarNumero(certificados.length)}</em>
+                            <em className="painel-count">{certificados.length}</em>
                           )}
                         </span>
 
@@ -698,7 +697,7 @@ export const PainelSection: React.FC<PainelSectionProps> = ({ currentUserId, cur
                                 <div>
                                   <strong>{item.title}</strong>
                                   <span>
-                                    {formatarNumero(item.correct)}/{formatarNumero(item.total)} · {formatarPercentual(item.percentage)} ·{' '}
+                                    {item.correct}/{item.total} · {item.percentage}% ·{' '}
                                     {formatDate(item.completedAt)}
                                   </span>
                                 </div>
@@ -715,10 +714,10 @@ export const PainelSection: React.FC<PainelSectionProps> = ({ currentUserId, cur
                   {cargo !== 'Administrador' && (
                     <footer className="painel-card-foot">
                       <span className="painel-resumo">
-                        {formatarNumero(levels.length)}{' '}
-                        {levels.length === 1 ? 'avaliação' : 'avaliações'} · {formatarNumero(simulados.length)}{' '}
-                        {simulados.length === 1 ? 'simulado' : 'simulados'} · {formatarNumero(tracks.length)}{' '}
-                        {tracks.length === 1 ? 'trilha' : 'trilhas'} · {formatarNumero(certificados.length)}{' '}
+                        {levels.length}{' '}
+                        {levels.length === 1 ? 'avaliação' : 'avaliações'} · {simulados.length}{' '}
+                        {simulados.length === 1 ? 'simulado' : 'simulados'} · {tracks.length}{' '}
+                        {tracks.length === 1 ? 'trilha' : 'trilhas'} · {certificados.length}{' '}
                         {certificados.length === 1 ? 'certificado' : 'certificados'}
                       </span>
 
