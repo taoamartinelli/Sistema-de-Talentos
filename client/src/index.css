@@ -2803,6 +2803,27 @@ body {
 }
 
 /* ---------- Pagina Minha Jornada ---------- */
+/* Aviso do Painel quando a lista vem do progresso, sem o backend. */
+.painel-aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-top: 1.8rem;
+  padding: 0.9rem 1.1rem;
+  background: #1d1a17;
+  border: 1px solid #3a2f22;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.painel-aviso svg {
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+  color: #d9a441;
+}
+
 .journey-summary {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));

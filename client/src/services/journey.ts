@@ -11,14 +11,51 @@ export interface JourneyEntry {
 // A jornada fica no navegador até existir banco de dados no backend.
 const storageKey = (userId: string) => `zello:jornada:${userId}`;
 
+/**
+ * Trilha com módulo respondido foi necessariamente iniciada. Quando a entrada
+ * da jornada falta — perdida numa sincronização, por exemplo — ela é remontada
+ * a partir dos módulos. Sair de uma trilha apaga os módulos junto, então isto
+ * não ressuscita trilha abandonada de propósito.
+ */
+function remontarFaltantes(userId: string, entries: JourneyEntry[]): JourneyEntry[] {
+  const existentes = new Set(entries.map((entry) => entry.trilhaId));
+  const remontadas: JourneyEntry[] = [];
+
+  TRILHAS.forEach((trilha) => {
+    if (existentes.has(trilha.id)) return;
+
+    const resultados = loadModuleResults(userId, trilha.id);
+    const respondidos = Object.values(resultados);
+    if (respondidos.length === 0) return;
+
+    // Sem registro do início, vale a conclusão mais antiga que existe.
+    const inicio = respondidos
+      .map((resultado) => resultado.completedAt)
+      .filter(Boolean)
+      .sort()[0];
+
+    remontadas.push({
+      trilhaId: trilha.id,
+      startedAt: inicio ?? new Date().toISOString(),
+      completedModules: completedModuleIds(resultados)
+    });
+  });
+
+  return remontadas.length > 0 ? [...entries, ...remontadas] : entries;
+}
+
 export function loadJourney(userId: string): JourneyEntry[] {
   try {
     const raw = localStorage.getItem(storageKey(userId));
     const entries = raw ? (JSON.parse(raw) as JourneyEntry[]) : [];
     // Descarta trilhas que não existem mais no catálogo.
-    return entries.filter((entry) => TRILHAS.some((trilha) => trilha.id === entry.trilhaId));
+    const validas = entries.filter((entry) =>
+      TRILHAS.some((trilha) => trilha.id === entry.trilhaId)
+    );
+
+    return remontarFaltantes(userId, validas);
   } catch {
-    return [];
+    return remontarFaltantes(userId, []);
   }
 }
 

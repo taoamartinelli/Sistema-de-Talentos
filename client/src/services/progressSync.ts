@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
+import { collection, doc, getDocs, runTransaction, setDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { AssessmentKey } from '../data/assessments';
 import { ResultMap, loadResults, saveResult } from './assessmentStorage';
@@ -126,38 +126,174 @@ export function applyLocal(userId: string, snapshot: ProgressSnapshot): void {
   });
 }
 
-/** Envia o progresso deste navegador para a nuvem. */
+/**
+ * Entre dois resultados da mesma prova vale o melhor: aprovado ganha de
+ * reprovado, depois o maior percentual, e por último o mais recente.
+ */
+function melhor<T extends { percentage: number; approved: boolean; completedAt: string }>(
+  a: T | undefined,
+  b: T | undefined
+): T | undefined {
+  if (!a) return b;
+  if (!b) return a;
+  if (a.approved !== b.approved) return a.approved ? a : b;
+  if (a.percentage !== b.percentage) return a.percentage > b.percentage ? a : b;
+  return (a.completedAt ?? '') >= (b.completedAt ?? '') ? a : b;
+}
+
+/** Junta as duas jornadas por trilha, somando os módulos concluídos em cada uma. */
+function unirJornada(remota: JourneyEntry[] = [], local: JourneyEntry[] = []): JourneyEntry[] {
+  const porTrilha = new Map<string, JourneyEntry>();
+
+  [...remota, ...local].forEach((entrada) => {
+    if (!entrada?.trilhaId) return;
+
+    const atual = porTrilha.get(entrada.trilhaId);
+    const concluidos = new Set([
+      ...(atual?.completedModules ?? []),
+      ...(entrada.completedModules ?? [])
+    ]);
+
+    porTrilha.set(entrada.trilhaId, {
+      trilhaId: entrada.trilhaId,
+      // Vale o primeiro início registrado, venha de onde vier.
+      startedAt:
+        atual && (atual.startedAt ?? '') <= (entrada.startedAt ?? '')
+          ? atual.startedAt
+          : entrada.startedAt,
+      completedModules: [...concluidos]
+    });
+  });
+
+  return [...porTrilha.values()];
+}
+
+/**
+ * Funde o que está na nuvem com o que está neste navegador. Nada é descartado:
+ * cada máquina guarda só uma parte do progresso, e gravar apenas a sua parte
+ * apagaria o que foi feito nas outras.
+ */
+export function unirProgresso(
+  remoto: ProgressSnapshot | null,
+  local: ProgressSnapshot
+): ProgressSnapshot {
+  if (!remoto) return local;
+
+  const assessments: ResultMap = { ...(remoto.assessments ?? {}) };
+  Object.entries(local.assessments ?? {}).forEach(([chave, resultado]) => {
+    const escolhido = melhor(assessments[chave as AssessmentKey], resultado);
+    if (escolhido) assessments[chave as AssessmentKey] = escolhido;
+  });
+
+  const modules: Record<string, ModuleResults> = {};
+  const trilhas = new Set([
+    ...Object.keys(remoto.modules ?? {}),
+    ...Object.keys(local.modules ?? {})
+  ]);
+  trilhas.forEach((trilha) => {
+    const juntos: ModuleResults = { ...(remoto.modules?.[trilha] ?? {}) };
+    Object.entries(local.modules?.[trilha] ?? {}).forEach(([moduloId, resultado]) => {
+      const escolhido = melhor(juntos[moduloId], resultado);
+      if (escolhido) juntos[moduloId] = escolhido;
+    });
+    modules[trilha] = juntos;
+  });
+
+  const simulados: Record<string, SimuladoResult> = { ...(remoto.simulados ?? {}) };
+  Object.entries(local.simulados ?? {}).forEach(([trilha, resultado]) => {
+    const escolhido = melhor(simulados[trilha], resultado);
+    if (escolhido) simulados[trilha] = escolhido;
+  });
+
+  return {
+    ...local,
+    acknowledged: Boolean(remoto.acknowledged || local.acknowledged),
+    interests: [...new Set([...(remoto.interests ?? []), ...(local.interests ?? [])])],
+    assessments,
+    journey: unirJornada(remoto.journey, local.journey),
+    modules,
+    simulados,
+    // A saída registrada na nuvem não se perde por causa de uma gravação.
+    ...(remoto.lastLogoutAt ? { lastLogoutAt: remoto.lastLogoutAt } : {})
+  };
+}
+
+/**
+ * Enquanto o login não termina de baixar a nuvem, este navegador ainda está
+ * vazio. Gravar nesse intervalo apagaria o progresso feito em outra máquina,
+ * então toda escrita espera o portão abrir.
+ */
+const portoes = new Map<string, Promise<void>>();
+const aberturas = new Map<string, () => void>();
+
+function portao(userId: string): Promise<void> {
+  const existente = portoes.get(userId);
+  if (existente) return existente;
+
+  const espera = new Promise<void>((resolve) => aberturas.set(userId, resolve));
+  portoes.set(userId, espera);
+  return espera;
+}
+
+function abrirPortao(userId: string): void {
+  portao(userId);
+  aberturas.get(userId)?.();
+}
+
+/**
+ * Grava o estado consolidado e devolve o que ficou valendo. A leitura e a
+ * escrita vão na mesma transação para que duas abas abertas não sobrescrevam
+ * uma à outra.
+ */
+async function gravar(
+  userId: string,
+  identity: { name: string; email: string; avatarUrl?: string }
+): Promise<ProgressSnapshot | null> {
+  const referencia = doc(db, COLLECTION, userId);
+  const local = collectLocal(userId, identity);
+
+  try {
+    return await runTransaction(db, async (transacao) => {
+      const atual = await transacao.get(referencia);
+      const remoto = atual.exists() ? (atual.data() as ProgressSnapshot) : null;
+      const unido = unirProgresso(remoto, local);
+      transacao.set(referencia, unido);
+      return unido;
+    });
+  } catch (err) {
+    // Sem Firestore configurado o sistema segue funcionando só com o navegador.
+    console.warn('Não foi possível salvar o progresso na nuvem:', err);
+    return null;
+  }
+}
+
+/** Envia o progresso deste navegador para a nuvem, sem descartar o que já havia. */
 export async function pushProgress(
   userId: string,
   identity: { name: string; email: string; avatarUrl?: string }
 ): Promise<void> {
-  try {
-    await setDoc(doc(db, COLLECTION, userId), collectLocal(userId, identity));
-  } catch (err) {
-    // Sem Firestore configurado o sistema segue funcionando só com o navegador.
-    console.warn('Não foi possível salvar o progresso na nuvem:', err);
-  }
+  await portao(userId);
+  await gravar(userId, identity);
 }
 
 /**
- * Traz o progresso da nuvem no login. Se ainda não houver registro,
- * sobe o que existir neste navegador — é a migração do que já foi feito.
+ * No login, funde nuvem e navegador e devolve o resultado para os dois lados.
+ * Aplicar o documento remoto cru apagaria o que só existe aqui — uma jornada
+ * vazia na nuvem, por exemplo, substituiria a jornada deste navegador.
  */
 export async function syncProgress(
   userId: string,
   identity: { name: string; email: string; avatarUrl?: string }
 ): Promise<void> {
   try {
-    const snapshot = await getDoc(doc(db, COLLECTION, userId));
-
-    if (snapshot.exists()) {
-      applyLocal(userId, snapshot.data() as ProgressSnapshot);
-    }
-
-    // Sempre devolve o estado consolidado, para a nuvem refletir o local.
-    await pushProgress(userId, identity);
+    const unido = await gravar(userId, identity);
+    if (unido) applyLocal(userId, unido);
   } catch (err) {
     console.warn('Não foi possível sincronizar o progresso:', err);
+  } finally {
+    // Mesmo em caso de falha o portão abre: travar as gravações para sempre
+    // seria pior do que gravar com o que houver.
+    abrirPortao(userId);
   }
 }
 

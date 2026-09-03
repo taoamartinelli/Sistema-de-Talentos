@@ -235,13 +235,43 @@ function levelFromSnapshot(snap: ProgressSnapshot): UserLevel {
   );
   if (certificado) return 2;
 
-  return (snap.journey ?? []).length > 0 ? 1 : 0;
+  // Modulo respondido e prova de trilha iniciada, mesmo sem registro na
+  // jornada. O 360 fica de fora: e a formacao base, nao uma das trilhas.
+  const iniciou =
+    (snap.journey ?? []).length > 0 ||
+    TRACK_IDS.filter((trackId) => trackId !== '360').some(
+      (trackId) => Object.keys(snap.modules?.[trackId] ?? {}).length > 0
+    );
+
+  return iniciou ? 1 : 0;
+}
+
+/**
+ * Lista de pessoas montada a partir do progresso gravado no Firestore.
+ * Serve de reserva para quando o backend está sem a credencial do Firebase
+ * Admin: o Painel deixa de ficar vazio e mostra quem já usou o sistema.
+ * Só aparece quem sincronizou ao menos uma vez, e o cargo — que vive em
+ * custom claim do Auth — não vem junto.
+ */
+function usuariosDoProgresso(progresso: Record<string, ProgressSnapshot>): SystemUser[] {
+  return Object.entries(progresso)
+    .filter(([, snap]) => Boolean(snap?.email))
+    .map(([id, snap]) => ({
+      id,
+      name: snap.name || snap.email.split('@')[0],
+      email: snap.email,
+      avatarUrl: snap.avatarUrl,
+      createdAt: null,
+      lastSignInAt: snap.lastSeen ?? null,
+      disabled: false
+    }));
 }
 
 export const PainelSection: React.FC<PainelSectionProps> = ({ currentUserId, currentRole }) => {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [aviso, setAviso] = useState<string | null>(null);
   // Por padrão o card mostra só a primeira trilha; o botão abre o restante.
   const [expandidos, setExpandidos] = useState<string[]>([]);
   // Atribuição de perfil: disponível de Líder para cima.
@@ -310,7 +340,12 @@ export const PainelSection: React.FC<PainelSectionProps> = ({ currentUserId, cur
     Promise.all([fetchUsers(), fetchAllProgress()]).then(([{ users, error: falha }, progresso]) => {
       if (!ativo) return;
 
-      const linhas: Row[] = users.map((user) => {
+      // Sem credencial no backend a lista do Auth volta vazia. O progresso do
+      // Firestore é lido direto do navegador, então serve de reserva.
+      const base = users.length > 0 ? users : usuariosDoProgresso(progresso);
+      const emReserva = users.length === 0 && base.length > 0;
+
+      const linhas: Row[] = base.map((user) => {
         const cargo = roleOf(user);
         const snap = progresso[user.id];
 
@@ -364,7 +399,9 @@ export const PainelSection: React.FC<PainelSectionProps> = ({ currentUserId, cur
       );
 
       setRows(linhas);
-      setError(falha ?? null);
+      // Com linhas na tela o erro vira aviso; sem ninguém, continua bloqueando.
+      setAviso(emReserva ? falha ?? null : null);
+      setError(linhas.length > 0 ? null : falha ?? null);
       setLoading(false);
     });
 
@@ -408,6 +445,16 @@ export const PainelSection: React.FC<PainelSectionProps> = ({ currentUserId, cur
         </section>
       ) : (
         <>
+          {aviso ? (
+            <div className="painel-aviso">
+              <Info size={16} />
+              <span>
+                Lista montada a partir do progresso salvo — o backend está sem a credencial
+                do Firebase Admin. Aparece só quem já acessou o sistema, e o cargo não pode
+                ser alterado.
+              </span>
+            </div>
+          ) : null}
           <div className="journey-summary">
             <div>
               <strong>{formatarNumero(rows.length)}</strong>
