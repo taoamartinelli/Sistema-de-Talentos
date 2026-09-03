@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { formatarNumero, formatarNumeroDuplo, formatarPercentual } from '../utils/numero';
 import { ArrowLeft, ArrowRight, Check, Play, Route } from 'lucide-react';
 import { AREAS, TRILHAS, TRILHA_PASSING_SCORE, TrackArea, Trilha } from '../data/trilhas';
 import { TrackPage } from './TrackPage';
@@ -81,7 +80,7 @@ export const TrilhasSection: React.FC<TrilhasSectionProps> = ({
           </div>
 
           <span className="home-badge">
-            Trilha {formatarNumeroDuplo(selected.number)}
+            Trilha {String(selected.number).padStart(2, '0')}
           </span>
 
           <div className="trilha-title-row">
@@ -146,7 +145,7 @@ export const TrilhasSection: React.FC<TrilhasSectionProps> = ({
               <h2>{area.title}</h2>
               <p>{area.description}</p>
               <span className="trilha-area-count">
-                {formatarNumero(trilhas.length)} {trilhas.length === 1 ? 'trilha' : 'trilhas'}
+                {trilhas.length} {trilhas.length === 1 ? 'trilha' : 'trilhas'}
               </span>
             </div>
 
@@ -154,13 +153,13 @@ export const TrilhasSection: React.FC<TrilhasSectionProps> = ({
               {trilhas.map((trilha) => (
                 <article key={trilha.id} className="t360-module">
                   <span className="t360-module-number">
-                    Trilha {formatarNumeroDuplo(trilha.number)}
+                    Trilha {String(trilha.number).padStart(2, '0')}
                   </span>
                   <h3>{trilha.title}</h3>
                   <p>{trilha.objective}</p>
                   <span className="t360-module-count">
                     {trilha.modules.length > 0
-                      ? `${formatarNumero(trilha.modules.length)} ${trilha.modules.length === 1 ? 'módulo' : 'módulos'}`
+                      ? `${trilha.modules.length} ${trilha.modules.length === 1 ? 'módulo' : 'módulos'}`
                       : 'Conteúdo em preparação'}
                   </span>
                   <button type="button" className="btn-ghost" onClick={() => openTrilha(trilha)}>
@@ -183,7 +182,7 @@ export const TrilhasSection: React.FC<TrilhasSectionProps> = ({
             <Route size={14} /> Cada trilha reúne módulos, conteúdos, flash cards e simulado.
           </li>
           <li>
-            <Route size={14} /> O simulado tem 50 questões e exige {formatarPercentual(TRILHA_PASSING_SCORE)} de acerto para aprovação.
+            <Route size={14} /> O simulado tem 50 questões e exige {TRILHA_PASSING_SCORE}% de acerto para aprovação.
           </li>
         </ul>
       </div>

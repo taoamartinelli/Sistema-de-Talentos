@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { formatarNumero, formatarNumeroDuplo, formatarPercentual } from '../utils/numero';
 import { AlertTriangle, ArrowRight, Check, Layers, Plus, Trash2, X } from 'lucide-react';
 import { AREAS, TRILHAS } from '../data/trilhas';
 import { formatStartedAt, loadJourney, progressOf, removeTrilha } from '../services/journey';
@@ -135,19 +134,19 @@ export const JourneySection: React.FC<JourneySectionProps> = ({
         <>
           <div className="journey-summary">
             <div>
-              <strong>{formatarNumero(items.length)}</strong>
+              <strong>{items.length}</strong>
               <span>{items.length === 1 ? 'trilha iniciada' : 'trilhas iniciadas'}</span>
             </div>
             <div>
-              <strong>{formatarPercentual(average)}</strong>
+              <strong>{average}%</strong>
               <span>progresso médio</span>
             </div>
             <div>
               <strong>
-                {formatarNumero(
+                {
                   items.filter((item) => item.progress.percentage === 100 && item.progress.total > 0)
                     .length
-                )}
+                }
               </strong>
               <span>concluídas</span>
             </div>
@@ -174,7 +173,7 @@ export const JourneySection: React.FC<JourneySectionProps> = ({
                   <div className="journey-item-head">
                     <div>
                       <span className="t360-module-number">
-                        Trilha {formatarNumeroDuplo(trilha.number)} · {area?.key === 'analista' ? 'Analista' : 'Desenvolvimento'}
+                        Trilha {String(trilha.number).padStart(2, '0')} · {area?.key === 'analista' ? 'Analista' : 'Desenvolvimento'}
                       </span>
                       <h3>{trilha.title}</h3>
                       <span className="journey-item-date">
@@ -183,7 +182,7 @@ export const JourneySection: React.FC<JourneySectionProps> = ({
                     </div>
 
                     <div className="journey-item-actions">
-                      <span className="journey-percent">{formatarPercentual(progress.percentage)}</span>
+                      <span className="journey-percent">{progress.percentage}%</span>
                       <button
                         type="button"
                         className="icon-btn"

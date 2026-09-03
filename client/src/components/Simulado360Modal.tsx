@@ -1,5 +1,4 @@
 import React from 'react';
-import { formatarPercentual } from '../utils/numero';
 import { AlertCircle, BookOpen, CheckCircle2, Route, RotateCcw, X } from 'lucide-react';
 
 interface Simulado360ModalProps {
@@ -43,7 +42,7 @@ export const Simulado360Modal: React.FC<Simulado360ModalProps> = ({
             Aprovada no 360, <span className="approval-name">{userName.split(' ')[0]}</span>!
           </h3>
           <p className="approval-lead">
-            Você concluiu o simulado da formação 360 com {formatarPercentual(percentage)} de acerto e a base está
+            Você concluiu o simulado da formação 360 com {percentage}% de acerto e a base está
             consolidada.
           </p>
 
@@ -64,7 +63,7 @@ export const Simulado360Modal: React.FC<Simulado360ModalProps> = ({
             <span className="approval-name">{userName.split(' ')[0]}</span>, ainda não foi dessa vez
           </h3>
           <p className="approval-lead">
-            Você fez {formatarPercentual(percentage)} no simulado do 360 e o mínimo para aprovação é {formatarPercentual(passingScore)}.
+            Você fez {percentage}% no simulado do 360 e o mínimo para aprovação é {passingScore}%.
           </p>
 
           <div className="approval-note">

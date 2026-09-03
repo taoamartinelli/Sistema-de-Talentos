@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import { formatarNumero, formatarPercentual } from '../utils/numero';
 import {
   AlertCircle,
   ArrowLeft,
@@ -164,7 +163,7 @@ export const AssessmentSection: React.FC<AssessmentSectionProps> = ({
       <div className="assess">
         <div className={`assess-result ${finished.approved ? 'approved' : 'rejected'}`}>
           <div className="assess-result-score">
-            <strong>{formatarPercentual(finished.percentage)}</strong>
+            <strong>{finished.percentage}%</strong>
             <span>
               {finished.correct} de {finished.total} corretas
             </span>
@@ -183,7 +182,7 @@ export const AssessmentSection: React.FC<AssessmentSectionProps> = ({
             </p>
           ) : (
             <p>
-              O mínimo para aprovação é <strong>{formatarPercentual(PASSING_SCORE)}</strong> de acerto em cada teste.
+              O mínimo para aprovação é <strong>{PASSING_SCORE}%</strong> de acerto em cada teste.
               Refaça quando quiser — revise os pontos marcados em vermelho abaixo.
             </p>
           )}
@@ -227,7 +226,7 @@ export const AssessmentSection: React.FC<AssessmentSectionProps> = ({
               <ArrowLeft size={14} /> Sair do teste
             </button>
             <span className="assess-counter">
-              Questão {formatarNumero(index + 1)} de {formatarNumero(questions.length)}
+              Questão {index + 1} de {questions.length}
             </span>
           </header>
 
@@ -291,16 +290,16 @@ export const AssessmentSection: React.FC<AssessmentSectionProps> = ({
           {visibleAssessments.length === 1 ? (
             <>
               O teste da área que você escolheu tem{' '}
-              {formatarNumero(visibleAssessments[0].questions.length)} questões de múltipla escolha, sem tempo
+              {visibleAssessments[0].questions.length} questões de múltipla escolha, sem tempo
               cronometrado. Para ser aprovado é preciso acertar no mínimo{' '}
-              <strong>{formatarPercentual(PASSING_SCORE)}</strong> — é o resultado dele que define o seu ponto de
+              <strong>{PASSING_SCORE}%</strong> — é o resultado dele que define o seu ponto de
               partida na trilha.
             </>
           ) : (
             <>
               São dois testes independentes: um de desenvolvimento e um de análise. Cada um tem 16
               questões de múltipla escolha, sem tempo cronometrado. É preciso acertar no mínimo{' '}
-              <strong>{formatarPercentual(PASSING_SCORE)}</strong> para ser aprovado — a aprovação em um dos testes já
+              <strong>{PASSING_SCORE}%</strong> para ser aprovado — a aprovação em um dos testes já
               libera as trilhas.
             </>
           )}
@@ -332,8 +331,8 @@ export const AssessmentSection: React.FC<AssessmentSectionProps> = ({
               <p>{assessment.description}</p>
 
               <ul className="assess-meta">
-                <li>{formatarNumero(assessment.questions.length)} questões</li>
-                <li>Mínimo de {formatarPercentual(PASSING_SCORE)}</li>
+                <li>{assessment.questions.length} questões</li>
+                <li>Mínimo de {PASSING_SCORE}%</li>
                 <li>Sem tempo limite</li>
               </ul>
 
@@ -342,10 +341,10 @@ export const AssessmentSection: React.FC<AssessmentSectionProps> = ({
                   <div>
                     <strong>{result.level}</strong>
                     <span>
-                      {formatarNumero(result.correct)}/{formatarNumero(result.total)} acertos · {formatCompletedAt(result.completedAt)}
+                      {result.correct}/{result.total} acertos · {formatCompletedAt(result.completedAt)}
                     </span>
                   </div>
-                  <span className="assess-card-score">{formatarPercentual(result.percentage)}</span>
+                  <span className="assess-card-score">{result.percentage}%</span>
                 </div>
               )}
 

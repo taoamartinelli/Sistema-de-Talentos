@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { formatarNumero, formatarNumeroDuplo, formatarPercentual } from '../utils/numero';
 import {
   ArrowLeft,
   ArrowRight,
@@ -134,7 +133,7 @@ const QuizRunner: React.FC<{
           <ArrowLeft size={14} /> {exitLabel}
         </button>
         <span className="assess-counter">
-          Questão {formatarNumero(index + 1)} de {formatarNumero(questions.length)}
+          Questão {index + 1} de {questions.length}
         </span>
       </header>
 
@@ -255,18 +254,18 @@ const ModulesTab: React.FC<{
           return (
             <article key={module.id} className={`t360-module ${unlocked ? '' : 'locked'}`}>
               <span className="t360-module-number">
-                {moduleLabel} {formatarNumeroDuplo(module.number)}
+                {moduleLabel} {String(module.number).padStart(2, '0')}
               </span>
               <h3>{module.title}</h3>
               <p>{module.objective}</p>
 
               {result?.approved ? (
                 <span className="t360-module-result">
-                  <CheckCircle2 size={13} /> Simulado {formatarNumero(result.correct)}/{formatarNumero(result.total)} · {formatarPercentual(result.percentage)}
+                  <CheckCircle2 size={13} /> Simulado {result.correct}/{result.total} · {result.percentage}%
                 </span>
               ) : (
                 <span className="t360-module-count">
-                  {formatarNumero(module.topics.length)} {module.topics.length === 1 ? 'tópico' : 'tópicos'}
+                  {module.topics.length} {module.topics.length === 1 ? 'tópico' : 'tópicos'}
                 </span>
               )}
 
@@ -342,12 +341,12 @@ const ContentsTab: React.FC<{
               disabled={!unlocked}
               title={unlocked ? undefined : 'Conclua o módulo anterior para liberar'}
             >
-              <span className="t360-module-item-number">{formatarNumeroDuplo(module.number)}</span>
+              <span className="t360-module-item-number">{String(module.number).padStart(2, '0')}</span>
               <span className="t360-module-item-body">
                 <span className="t360-module-item-title">{module.title}</span>
                 {moduleResult && (
                   <span className={`t360-module-item-score ${moduleResult.approved ? 'ok' : 'fail'}`}>
-                    Simulado — {formatarNumero(moduleResult.correct)}/{formatarNumero(moduleResult.total)} · {formatarPercentual(moduleResult.percentage)}
+                    Simulado — {moduleResult.correct}/{moduleResult.total} · {moduleResult.percentage}%
                   </span>
                 )}
               </span>
@@ -359,7 +358,7 @@ const ContentsTab: React.FC<{
 
       <article className="t360-content">
         <span className="t360-module-number">
-          {moduleLabel} {formatarNumeroDuplo(selected.number)}
+          {moduleLabel} {String(selected.number).padStart(2, '0')}
         </span>
         <h2>{selected.title}</h2>
         <p className="t360-objective">
@@ -410,7 +409,7 @@ const ContentsTab: React.FC<{
               </p>
               {result && (
                 <span className={`t360-module-item-score ${result.approved ? 'ok' : 'fail'}`}>
-                  Última tentativa — {formatarNumero(result.correct)}/{formatarNumero(result.total)} · {formatarPercentual(result.percentage)}
+                  Última tentativa — {result.correct}/{result.total} · {result.percentage}%
                 </span>
               )}
             </div>
@@ -462,9 +461,9 @@ const ModuleQuiz: React.FC<{
     return (
       <div className={`assess-result ${result.approved ? 'approved' : 'rejected'}`}>
         <div className="assess-result-score">
-          <strong>{formatarPercentual(result.percentage)}</strong>
+          <strong>{result.percentage}%</strong>
           <span>
-            {formatarNumero(result.correct)} de {formatarNumero(result.total)} corretas
+            {result.correct} de {result.total} corretas
           </span>
         </div>
 
@@ -473,7 +472,7 @@ const ModuleQuiz: React.FC<{
         </span>
 
         <h2>
-          {moduleLabel} {formatarNumeroDuplo(module.number)} — {module.title}
+          {moduleLabel} {String(module.number).padStart(2, '0')} — {module.title}
         </h2>
         <p>
           {result.approved
@@ -499,7 +498,7 @@ const ModuleQuiz: React.FC<{
     <>
       <div className="t360-quiz-head">
         <span className="t360-module-number">
-          {moduleLabel} {formatarNumeroDuplo(module.number)} · Simulado de conclusão
+          {moduleLabel} {String(module.number).padStart(2, '0')} · Simulado de conclusão
         </span>
         <h2>{module.title}</h2>
       </div>
@@ -598,7 +597,7 @@ const ModulePicker: React.FC<{
               }}
             >
               <span className="t360-picker-number">
-                {option.number !== null ? formatarNumeroDuplo(option.number) : '★'}
+                {option.number !== null ? String(option.number).padStart(2, '0') : '★'}
               </span>
               <span className="t360-picker-title">{option.title}</span>
               <span className="t360-picker-count">{option.count}</span>
@@ -654,7 +653,7 @@ const FlashcardsTab: React.FC<{
 
         <div className="t360-flash-progress">
           <span className="t360-flash-counter">
-            {formatarNumero(position + 1)} <em>/ {formatarNumero(deck.length)}</em>
+            {position + 1} <em>/ {deck.length}</em>
           </span>
           <div className="t360-flash-bar">
             <div style={{ width: `${((position + 1) / deck.length) * 100}%` }} />
@@ -718,9 +717,9 @@ const SimuladoTab: React.FC<{
     return (
       <div className={`assess-result ${approved ? 'approved' : 'rejected'}`}>
         <div className="assess-result-score">
-          <strong>{formatarPercentual(score.percentage)}</strong>
+          <strong>{score.percentage}%</strong>
           <span>
-            {score.correct} de {formatarNumero(questions.length)} corretas
+            {score.correct} de {questions.length} corretas
           </span>
         </div>
 
@@ -732,7 +731,7 @@ const SimuladoTab: React.FC<{
         <p>
           {approved
             ? 'Você atingiu o mínimo exigido e pode seguir para a próxima etapa.'
-            : `O mínimo para aprovação é ${formatarPercentual(passingScore)}. Revise os conteúdos e tente novamente.`}
+            : `O mínimo para aprovação é ${passingScore}%. Revise os conteúdos e tente novamente.`}
         </p>
 
         <div className="assess-result-actions">
@@ -753,8 +752,8 @@ const SimuladoTab: React.FC<{
         <FileCheck2 size={28} />
         <h2>Simulado</h2>
         <p>
-          {formatarNumero(source.length)} questões cobrindo todo o conteúdo da trilha. Mínimo de{' '}
-          <strong>{formatarPercentual(passingScore)}</strong> para aprovação, sem tempo limite.
+          {source.length} questões cobrindo todo o conteúdo da trilha. Mínimo de{' '}
+          <strong>{passingScore}%</strong> para aprovação, sem tempo limite.
         </p>
         <button type="button" className="btn-primary" onClick={start}>
           Iniciar simulado
@@ -967,8 +966,8 @@ export const TrackPage: React.FC<TrackPageProps> = ({
               <Lock size={26} />
               <strong>Simulado bloqueado</strong>
               <span>
-                Conclua todos os módulos para liberar. Faltam {formatarNumero(pendingModules.length)} de{' '}
-                {formatarNumero(modules.length)}: {pendingModules.map((module) => module.title).join(', ')}.
+                Conclua todos os módulos para liberar. Faltam {pendingModules.length} de{' '}
+                {modules.length}: {pendingModules.map((module) => module.title).join(', ')}.
               </span>
             </div>
           ) : (
